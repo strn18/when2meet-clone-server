@@ -1,40 +1,40 @@
 import {
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
-
-// 예시 entity입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
+import Event from './event.entity';
+import Vote from './vote.entity';
 
 @Entity()
 export default class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
-  firstName!: string;
+  @Column({
+    name: 'user_name',
+    type: 'varchar',
+    length: 50,
+    nullable: false,
+    default: 'user',
+    comment: '사용자 이름',
+  })
+  userName!: string;
 
   @Column({
+    name: 'password',
     type: 'varchar',
-    length: 100,
-    nullable: false,
-    default: '김',
-    comment: '사용자의 성',
+    length: 512,
+    nullable: true,
+    comment: '사용자 비밀번호',
   })
-  lastName!: string;
+  password?: string | null;
 
-  @Column({ nullable: true })
-  age?: number;
+  @ManyToOne(() => Event, (event) => event.users)
+  event!: Event;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  updatedAt?: Date;
-
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deletedAt?: Date;
+  @OneToMany(() => Vote, (vote) => vote.user)
+  votes!: Vote[]; // 유저가 어디어디에 투표했는지 알기 위해 필요하다(이전에 투표 후 다시 로그인 했을 때)
 }
