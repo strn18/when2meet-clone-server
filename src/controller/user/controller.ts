@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import UserService from '../../service/user.service';
-import CreateUserInput from '../../type/user/create.input';
+// import CreateUserInput from '../../type/user/create.input';
 import { BadRequestError } from '../../util/customErrors';
 
 // 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
@@ -18,27 +18,27 @@ export const getUserById: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const getUsersByAge: RequestHandler = async (req, res, next) => {
-  try {
-    const age = Number(req.params.age);
+// export const getUsersByAge: RequestHandler = async (req, res, next) => {
+//   try {
+//     const age = Number(req.params.age);
 
-    const users = await UserService.getUsersByAge(age);
+//     const users = await UserService.getUsersByAge(age);
 
-    res.json(users);
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.json(users);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-export const createUser: RequestHandler = async (req, res, next) => {
-  try {
-    const { firstName, lastName, age } = req.body as CreateUserInput;
-    const createUserInput: CreateUserInput = { firstName, lastName, age };
+// export const createUser: RequestHandler = async (req, res, next) => {
+//   try {
+//     const { firstName, lastName, age } = req.body as CreateUserInput;
+//     const createUserInput: CreateUserInput = { firstName, lastName, age };
 
-    const user = await UserService.saveUser(createUserInput);
+//     const user = await UserService.saveUser(createUserInput);
 
-    res.status(201).json(user.id);
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(201).json(user.id);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
