@@ -1,9 +1,18 @@
 import User from '../entity/user.entity';
 import UserRepository from '../repository/user.repository';
-// import CreateUserInput from '../type/user/create.input';
+import CreateUserInput from '../type/user/create.input';
 import { InternalServerError } from '../util/customErrors';
 
 export default class UserService {
+  static async saveUser(createUserInput: CreateUserInput): Promise<User> {
+    try {
+      const userEntity = UserRepository.create(createUserInput);
+      return await UserRepository.save(userEntity);
+    } catch (error) {
+      throw new InternalServerError('유저 정보 저장을 실패했습니다.');
+    }
+  }
+
   static async getUserById(id: number): Promise<User | null> {
     try {
       return await UserRepository.findOne({
