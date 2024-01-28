@@ -26,4 +26,15 @@ export default class EventService {
 
     return result;
   }
+
+  static async getEventByUrl(url: string): Promise<Event | null> {
+    try {
+      return await EventRepository.findOne({
+        where: { url },
+        relations: { users: { votes: { timePiece: true } } },
+      });
+    } catch (error) {
+      throw new InternalServerError('해당 url의 이벤트 검색을 실패했습니다.');
+    }
+  }
 }
