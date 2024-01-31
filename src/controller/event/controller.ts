@@ -1,8 +1,11 @@
 import { RequestHandler } from 'express';
 import EventService from '../../service/event.service';
 import TimePieceService from '../../service/timePiece.service';
+import VoteService from '../../service/vote.service';
 import CreateEventInput from '../../type/event/create.input';
 import CreateTimePieceInput from '../../type/timePiece/create.input';
+import TimePieceVoteResult from '../../type/timePiece/vote.result';
+import { BadRequestError } from '../../util/customErrors';
 
 // POST /event
 export const saveEvent: RequestHandler = async (req, res, next) => {
@@ -34,6 +37,47 @@ export const saveEvent: RequestHandler = async (req, res, next) => {
     });
 
     res.status(201).json(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /event/:url
+export const getTotalVotes: RequestHandler = async (req, res, next) => {
+  try {
+    const { url } = req.params;
+
+    const event = await EventService.getEventByUrl(url);
+    if (!event) throw new BadRequestError('해당하는 이벤트가 없습니다.');
+
+    const totalVotes = await VoteService.getVotesByUrl(url); // url에 해당하는 이벤트의 모든 표 정보 가져오기
+
+    const ret: {
+      timePieceVotes: TimePieceVoteResult[];
+      totalUserNames: string[];
+    } = {
+      timePieceVotes: [],
+      totalUserNames: event.users.map((user) => user.userName), // 이벤트의 모든 참여자들의 이름
+    };
+
+    if (totalVotes) {
+      totalVotes.forEach((curVote) => {
+        const exist = ret.timePieceVotes.find(
+          (timePieceVote) => timePieceVote.timePieceId == curVote.timePiece.id,
+        );
+
+        if (exist) {
+          exist.userNames.push(curVote.user.userName);
+        } else {
+          ret.timePieceVotes.push({
+            timePieceId: curVote.timePiece.id,
+            userNames: [curVote.user.userName],
+          });
+        }
+      });
+    }
+
+    res.status(200).json(ret);
   } catch (error) {
     next(error);
   }
