@@ -3,6 +3,19 @@ import VoteRepository from '../repository/vote.repository';
 import { InternalServerError } from '../util/customErrors';
 
 export default class VoteService {
+  static async getVotesByUrl(url: string): Promise<Vote[] | null> {
+    try {
+      return await VoteRepository.find({
+        where: { timePiece: { event: { url } } },
+        relations: { user: true, timePiece: true },
+        select: { user: { userName: true }, timePiece: { id: true } },
+      });
+    } catch (error) {
+      throw new InternalServerError('해당 url의 모든 표 정보 불러오기 실패.');
+    }
+  }
+
+  // 얘는 걍 임시임
   static async getVoteById(id: number): Promise<Vote | null> {
     try {
       return await VoteRepository.findOne({
