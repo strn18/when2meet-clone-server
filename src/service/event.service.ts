@@ -31,7 +31,8 @@ export default class EventService {
     try {
       return await EventRepository.findOne({
         where: { url },
-        relations: { users: { votes: { timePiece: true } } },
+        relations: { users: { votes: { timePiece: true } }, timePieces: true },
+        select: { timePieces: { id: true } },
       });
     } catch (error) {
       throw new InternalServerError('해당 url의 이벤트 검색을 실패했습니다.');
