@@ -15,10 +15,7 @@ export default class UserService {
 
   static async getUserById(id: number): Promise<User | null> {
     try {
-      return await UserRepository.findOne({
-        where: { id },
-        relations: { event: true },
-      });
+      return await UserRepository.findOne({ where: { id } });
     } catch (error) {
       throw new InternalServerError('유저 정보를 불러오는데 실패했습니다.');
     }
