@@ -1,5 +1,6 @@
 import Vote from '../entity/vote.entity';
 import VoteRepository from '../repository/vote.repository';
+import CreateVoteInput from '../type/vote/create.input';
 import { InternalServerError } from '../util/customErrors';
 
 export default class VoteService {
@@ -12,6 +13,23 @@ export default class VoteService {
       });
     } catch (error) {
       throw new InternalServerError('해당 url의 모든 표 정보 불러오기 실패.');
+    }
+  }
+
+  static async saveVote(createVoteInput: CreateVoteInput): Promise<Vote> {
+    try {
+      const voteEntity = await VoteRepository.create(createVoteInput);
+      return await VoteRepository.save(voteEntity);
+    } catch (error) {
+      throw new InternalServerError('투표 정보 저장을 실패했습니다.');
+    }
+  }
+
+  static async deleteVotesByUserId(userId: number): Promise<void> {
+    try {
+      const result = await VoteRepository.delete({ user: { id: userId } });
+    } catch (error) {
+      throw new InternalServerError('투표 삭제를 실패했습니다.');
     }
   }
 
