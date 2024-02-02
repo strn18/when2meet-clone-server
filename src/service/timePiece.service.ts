@@ -16,4 +16,12 @@ export default class TimePieceService {
       throw new InternalServerError('TimePiece 저장을 실패했습니다.');
     }
   }
+
+  static async getTimePieceById(id: number): Promise<TimePiece | null> {
+    try {
+      return await TimePieceRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new InternalServerError('TimePiece 불러오기를 실패했습니다.');
+    }
+  }
 }
