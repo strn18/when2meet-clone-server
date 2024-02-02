@@ -1,8 +1,11 @@
 import { RequestHandler } from 'express';
 import UserService from '../../service/user.service';
 import EventService from '../../service/event.service';
+import VoteService from '../../service/vote.service';
 import CreateUserInput from '../../type/user/create.input';
 import { BadRequestError } from '../../util/customErrors';
+import TimePieceService from '../../service/timePiece.service';
+import CreateVoteInput from '../../type/vote/create.input';
 
 // 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
 
@@ -31,6 +34,32 @@ export const getUserVotes: RequestHandler = async (req, res, next) => {
   }
 };
 
+// POST /user/:url
+export const saveUserVotes: RequestHandler = async (req, res, next) => {
+  try {
+    const { userId, votes } = req.body as { userId: number; votes: number[] };
+
+    const user = await UserService.getUserById(userId);
+    if (!user) throw new BadRequestError('해당 유저를 찾을 수 없습니다.');
+
+    await VoteService.deleteVotesByUserId(userId); // 현재 유저의 투표 정보 모두 삭제
+
+    votes.forEach(async (vote) => {
+      const timePiece = await TimePieceService.getTimePieceById(vote);
+      if (!timePiece)
+        throw new BadRequestError('TimePiece를 찾을 수 없습니다.');
+
+      const createVoteInput: CreateVoteInput = { user, timePiece };
+      await VoteService.saveVote(createVoteInput); // 방금 투표한 정보를 새로 저장
+    });
+
+    res.status(201).json(votes);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// 여기부터 임시
 export const getUserById: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.query.id);
