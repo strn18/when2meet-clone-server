@@ -60,20 +60,19 @@ export const getTotalVotes: RequestHandler = async (req, res, next) => {
       totalUserNames: event.users.map((user) => user.userName), // 이벤트의 모든 참여자들의 이름
     };
 
+    event.timePieces.forEach((timePiece) => {
+      ret.timePieceVotes.push({ timePieceId: timePiece.id, userNames: [] });
+    });
+
     if (totalVotes) {
       totalVotes.forEach((curVote) => {
-        const exist = ret.timePieceVotes.find(
+        const target = ret.timePieceVotes.find(
           (timePieceVote) => timePieceVote.timePieceId == curVote.timePiece.id,
         );
 
-        if (exist) {
-          exist.userNames.push(curVote.user.userName);
-        } else {
-          ret.timePieceVotes.push({
-            timePieceId: curVote.timePiece.id,
-            userNames: [curVote.user.userName],
-          });
-        }
+        if (!target)
+          throw new BadRequestError('투표한 timePiece가 event에 존재하지 않음');
+        target.userNames.push(curVote.user.userName);
       });
     }
 
