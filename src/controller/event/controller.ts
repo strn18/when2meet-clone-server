@@ -17,7 +17,10 @@ export const saveEvent: RequestHandler = async (req, res, next) => {
       eventName: string;
     };
 
-    const url = EventService.createRandomString(5); // ***이미 있는 url인지 중복 검사 해야 함.***
+    let url = EventService.createRandomString(5);
+    while (await EventService.getEventByUrl(url)) {
+      url = EventService.createRandomString(5);
+    }
     const createEventInput: CreateEventInput = { eventName, url };
     const event = await EventService.saveEvent(createEventInput);
 
