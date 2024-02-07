@@ -6,6 +6,10 @@ import CreateUserInput from '../../type/user/create.input';
 import { BadRequestError } from '../../util/customErrors';
 import TimePieceService from '../../service/timePiece.service';
 import CreateVoteInput from '../../type/vote/create.input';
+import {
+  generatePassword,
+  verifyPassword,
+} from '../../security/passwordHashing';
 
 // 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
 
@@ -20,14 +24,22 @@ export const getUserVotes: RequestHandler = async (req, res, next) => {
 
     const curUser = event.users.find((user) => user.userName == userName);
     if (!curUser) {
-      const createUserInput: CreateUserInput = { userName, password, event };
+      const hashedPassword = await generatePassword(password);
+      const createUserInput: CreateUserInput = {
+        userName,
+        password: hashedPassword,
+        event,
+      };
       await UserService.saveUser(createUserInput);
       res.json([]);
-    } else if (curUser.password == password) {
-      const votes = curUser.votes.map((vote) => vote.timePiece.id);
-      res.json(votes);
     } else {
-      throw new BadRequestError('비밀번호가 일치하지 않습니다.');
+      const isValid = await verifyPassword(password, curUser.password);
+      if (isValid) {
+        const votes = curUser.votes.map((vote) => vote.timePiece.id);
+        res.json(votes);
+      } else {
+        throw new BadRequestError('비밀번호가 일치하지 않습니다.');
+      }
     }
   } catch (error) {
     next(error);
