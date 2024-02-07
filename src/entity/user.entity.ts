@@ -27,10 +27,10 @@ export default class User {
     name: 'password',
     type: 'varchar',
     length: 512,
-    nullable: true,
+    nullable: false,
     comment: '사용자 비밀번호',
   })
-  password?: string | null;
+  password!: string; // 비밀번호를 입력하지 않으면 공백("")
 
   @ManyToOne(() => Event, (event) => event.users)
   event!: Event;
