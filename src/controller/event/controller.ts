@@ -56,9 +56,11 @@ export const getTotalVotes: RequestHandler = async (req, res, next) => {
     const totalVotes = await VoteService.getVotesByUrl(url); // url에 해당하는 이벤트의 모든 표 정보 가져오기
 
     const ret: {
+      eventName: string;
       timePieceVotes: TimePieceVoteResult[];
       totalUserNames: string[];
     } = {
+      eventName: event.eventName,
       timePieceVotes: [],
       totalUserNames: event.users.map((user) => user.userName), // 이벤트의 모든 참여자들의 이름
     };
