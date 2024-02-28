@@ -17,7 +17,10 @@ import {
 export const getUserVotes: RequestHandler = async (req, res, next) => {
   try {
     const { url } = req.params;
-    const { userName, password } = req.body;
+    const { userName, password } = req.query as {
+      userName: string;
+      password: string;
+    };
 
     const event = await EventService.getEventByUrl(url);
     if (!event) throw new BadRequestError('해당하는 이벤트가 없습니다.');
